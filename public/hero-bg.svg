@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a1a"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="60%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#1D4ED8" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0a0a1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1440" height="900" fill="url(#bg)"/>
+  <rect width="1440" height="900" fill="url(#glow)"/>
+
+  <!-- Decorative camera shapes -->
+  <g opacity="0.06" transform="translate(900,200) rotate(-15)">
+    <rect x="-120" y="-80" width="240" height="160" rx="20" fill="#fff"/>
+    <circle cx="0" cy="0" r="55" fill="#fff"/>
+    <circle cx="0" cy="0" r="38" fill="#0a0a1a" opacity="0.5"/>
+    <rect x="-30" y="-104" width="60" height="28" rx="8" fill="#fff"/>
+  </g>
+
+  <g opacity="0.04" transform="translate(200,600) rotate(10) scale(0.7)">
+    <rect x="-120" y="-80" width="240" height="160" rx="20" fill="#fff"/>
+    <circle cx="0" cy="0" r="55" fill="#fff"/>
+    <circle cx="0" cy="0" r="38" fill="#0a0a1a" opacity="0.5"/>
+  </g>
+
+  <!-- Tripod lines -->
+  <g opacity="0.05" stroke="#fff" stroke-width="3">
+    <line x1="1200" y1="300" x2="1100" y2="700"/>
+    <line x1="1200" y1="300" x2="1200" y2="700"/>
+    <line x1="1200" y1="300" x2="1300" y2="700"/>
+    <line x1="1100" y1="700" x2="1300" y2="700"/>
+  </g>
+
+  <g opacity="0.05" stroke="#fff" stroke-width="2">
+    <line x1="100" y1="200" x2="30" y2="600"/>
+    <line x1="100" y1="200" x2="100" y2="600"/>
+    <line x1="100" y1="200" x2="170" y2="600"/>
+    <line x1="30" y1="600" x2="170" y2="600"/>
+  </g>
+
+  <!-- Lens circles decorative -->
+  <circle cx="1300" cy="700" r="80" fill="none" stroke="#F97316" stroke-width="1" opacity="0.08"/>
+  <circle cx="1300" cy="700" r="55" fill="none" stroke="#F97316" stroke-width="1" opacity="0.06"/>
+  <circle cx="150" cy="150" r="60" fill="none" stroke="#1D4ED8" stroke-width="1" opacity="0.1"/>
+  <circle cx="150" cy="150" r="40" fill="none" stroke="#1D4ED8" stroke-width="1" opacity="0.08"/>
+</svg>

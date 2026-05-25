@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#F3F4F6"/>
+  <g transform="translate(200,150)">
+    <!-- Camera body -->
+    <rect x="-60" y="-40" width="120" height="80" rx="10" fill="#D1D5DB"/>
+    <!-- Lens circle -->
+    <circle cx="0" cy="0" r="28" fill="#9CA3AF"/>
+    <circle cx="0" cy="0" r="20" fill="#6B7280"/>
+    <circle cx="0" cy="0" r="12" fill="#374151"/>
+    <circle cx="-6" cy="-6" r="4" fill="#F9FAFB" opacity="0.4"/>
+    <!-- Viewfinder bump -->
+    <rect x="-15" y="-52" width="30" height="14" rx="4" fill="#9CA3AF"/>
+    <!-- Flash -->
+    <rect x="-55" y="-52" width="20" height="12" rx="3" fill="#D1D5DB"/>
+    <!-- Shutter button -->
+    <circle cx="45" cy="-42" r="7" fill="#9CA3AF"/>
+  </g>
+  <text x="200" y="245" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" fill="#9CA3AF">No Image Available</text>
+</svg>
