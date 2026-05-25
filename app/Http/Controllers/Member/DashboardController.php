@@ -131,12 +131,23 @@ class DashboardController extends Controller
             $user->email = $request->email;
         }
 
-        // ── Upload avatar ───────────────────────────────────────
+        // // ── Upload avatar ───────────────────────────────────────
+        // if ($request->hasFile('avatar')) {
+        //     if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+        //         Storage::disk('public')->delete($user->avatar);
+        //     }
+        //     $user->avatar = $request->file('avatar')->store('profile_photos', 'public');
+        // }
+
+        // $user->save();
+
+                // ── Upload avatar ───────────────────────────────────────
         if ($request->hasFile('avatar')) {
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
             }
-            $user->avatar = $request->file('avatar')->store('profile_photos', 'public');
+            // Ganti 'profile_photos' menjadi 'avatars'
+            $user->avatar = $request->file('avatar')->store('avatars', 'public');
         }
 
         $user->save();

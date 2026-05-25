@@ -114,6 +114,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/borrowing/{borrowing}/approve',     [AdminBorrowing::class, 'approve'])->name('borrowing.approve');
     Route::post('/borrowing/{borrowing}/reject',      [AdminBorrowing::class, 'reject'])->name('borrowing.reject');
     Route::post('/borrowing/{borrowing}/return',      [AdminBorrowing::class, 'markReturned'])->name('borrowing.return');
+    Route::post('/borrowing/{borrowing}/reject-return', [AdminBorrowing::class, 'rejectReturn'])->name('borrowing.rejectReturn');
 
     // History & Analytics
     Route::get('/history',        [AdminHistory::class, 'index'])->name('history.index');
@@ -141,7 +142,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Returns management
     Route::prefix('returns')->name('returns.')->group(function () {
         Route::get('/',               [AdminReturn::class, 'index'])->name('index');
-        Route::get('/{id}',           [AdminReturn::class, 'show'])->name('show');
+        Route::get('/{id}', function ($id) {
+            // Halaman detail return sudah dipindah ke borrowing show
+            $return = \App\Models\ItemReturn::with('borrowing')->findOrFail($id);
+            return redirect()->route('admin.borrowing.show', $return->borrowing_id);
+        })->name('show');
         Route::patch('/{id}/confirm', [AdminReturn::class, 'confirm'])->name('confirm');
         Route::patch('/{id}/reject',  [AdminReturn::class, 'reject'])->name('reject');
     });

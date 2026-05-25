@@ -181,12 +181,11 @@
             <div style="padding:20px;display:flex;flex-direction:column;gap:16px;">
 
                 {{-- Rental Period --}}
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
                     <div style="background:#f8fafc;border-radius:10px;padding:14px;">
                         <div style="font-size:11px;color:var(--gray-500);margin-bottom:4px;text-transform:uppercase;font-weight:600;">Tgl Pinjam</div>
                         <div style="font-size:15px;font-weight:700;color:#111827;">{{ $borrowing->borrow_date->format('d M Y') }}</div>
                         <div style="font-size:11px;color:var(--gray-500);">
-                            {{-- Ganti hari ke Indonesia --}}
                             @php
                                 $hariPinjam = ['Monday'=>'Senin','Tuesday'=>'Selasa','Wednesday'=>'Rabu','Thursday'=>'Kamis','Friday'=>'Jumat','Saturday'=>'Sabtu','Sunday'=>'Minggu'];
                                 echo $hariPinjam[$borrowing->borrow_date->format('l')] ?? $borrowing->borrow_date->format('l');
@@ -379,46 +378,57 @@
 
         {{-- ACTION CARD --}}
         @if($borrowing->status === 'pending' || $borrowing->status === 'approved')
-        <div class="card" style="padding:0;overflow:hidden;border:2px solid #e5e7eb;">
+        <div class="card" style="padding:0;overflow:hidden;border:1px solid var(--gray-200);box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <div style="padding:16px 20px;background:linear-gradient(135deg,#111827,#1f2937);display:flex;align-items:center;gap:8px;">
                 <svg width="16" height="16" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
                 <span style="font-size:13px;font-weight:700;color:#fff;">Tindakan Admin</span>
             </div>
-            <div style="padding:20px;display:flex;flex-direction:column;gap:10px;">
+            <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
 
                 @if($borrowing->status === 'pending')
-                {{-- APPROVE --}}
-                <form method="POST" action="{{ route('admin.borrowing.approve', $borrowing) }}">
-                    @csrf
-                    <button type="submit" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(5,150,105,.3);"
-                            onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(5,150,105,.4)'"
-                            onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(5,150,105,.3)'"
-                            onclick="return confirm('Setujui permintaan peminjaman dari {{ $borrowing->user->name }}?')">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
-                        Setujui Permintaan
-                    </button>
-                </form>
+                    {{-- JIKA STATUS PENDING: APPROVE UTAMA, REJECT SECONDARY --}}
+                    <form method="POST" action="{{ route('admin.borrowing.approve', $borrowing) }}" style="margin:0;">
+                        @csrf
+                        <button type="submit" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(5,150,105,.2);"
+                                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(5,150,105,.3)'"
+                                onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(5,150,105,.2)'"
+                                onclick="return confirm('Setujui permintaan peminjaman dari {{ $borrowing->user->name }}?')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+                            Setujui Permintaan
+                        </button>
+                    </form>
 
-                {{-- REJECT --}}
-                <button onclick="openModal('rejectModalDetail')"
-                        style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:1.5px solid #fecaca;background:#fff;color:#dc2626;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;"
-                        onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    Tolak Permintaan
-                </button>
+                    <button onclick="openModal('rejectModalDetail')"
+                            style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:1.5px solid #fecaca;background:#fff;color:#dc2626;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;"
+                            onmouseover="this.style.background='#fef2f2';this.style.transform='translateY(-1px)'" 
+                            onmouseout="this.style.background='#fff';this.style.transform=''">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Tolak Permintaan
+                    </button>
 
                 @elseif($borrowing->status === 'approved')
-                {{-- MARK RETURNED --}}
-                <button onclick="openModal('returnModalDetail')"
-                        style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(29,78,216,.3);"
-                        onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.45"/></svg>
-                    Konfirmasi Selesai / Kembali
-                </button>
+                    {{-- JIKA STATUS APPROVED: KONFIRMASI SELESAI UTAMA, TOLAK/BATALKAN DI BAWAHNYA --}}
+                    <button onclick="openModal('returnModalDetail')"
+                            style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(29,78,216,.2);"
+                            onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px rgba(29,78,216,.3)'" 
+                            onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(29,78,216,.2)'">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.45"/></svg>
+                        Konfirmasi Selesai / Kembali
+                    </button>
+
+                    <div style="border-top:1px dashed #e5e7eb; margin:4px 0;"></div>
+
+                    <button onclick="openModal('rejectModalDetail')"
+                            style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:10px;border:1px solid #fecaca;background:#fff5f5;color:#c53030;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;"
+                            onmouseover="this.style.background='#fff0f0';this.style.borderColor='#fc8181';" 
+                            onmouseout="this.style.background='#fff5f5';this.style.borderColor='#fecaca';">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Batalkan & Tolak Peminjaman
+                    </button>
                 @endif
 
                 <a href="{{ route('admin.borrowing.index') }}"
-                   style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:10px;border:1px solid var(--gray-200);background:#fff;color:#6b7280;font-size:13px;font-weight:600;text-decoration:none;transition:background .15s;"
+                   style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:10px;border:1px solid var(--gray-200);background:#fff;color:#6b7280;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;"
                    onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#fff'">
                     ← Kembali ke Daftar
                 </a>
@@ -456,24 +466,23 @@
 <div class="modal-overlay" id="rejectModalDetail">
     <div class="modal" style="width:420px;">
         <div class="modal-header">
-            <h3>Tolak Permintaan Peminjaman</h3>
+            <h3>Tolak / Batalkan Peminjaman</h3>
             <button class="modal-close" onclick="closeModal('rejectModalDetail')">✕</button>
         </div>
         <p class="text-sm text-gray mb-16">
-            Anda akan menolak transaksi <strong>{{ $borrowing->transaction_code }}</strong> —
-            alat <strong>{{ $borrowing->equipment->name }}</strong> yang diajukan oleh
-            <strong>{{ $borrowing->user->name }}</strong>.
+            Anda akan menolak/membatalkan transaksi <strong>{{ $borrowing->transaction_code }}</strong> untuk alat <strong>{{ $borrowing->equipment->name }}</strong>.
         </p>
         <form method="POST" action="{{ route('admin.borrowing.reject', $borrowing) }}">
             @csrf
             <div class="form-group">
-                <label class="form-label">Alasan Penolakan (opsional)</label>
-                <textarea name="admin_notes" class="form-control" rows="4"
-                          placeholder="Jelaskan alasan mengapa permintaan ini ditolak..."></textarea>
+                <label class="form-label" style="font-weight: 600; font-size: 13px; color: #374151;">Alasan Penolakan / Pembatalan</label>
+                <textarea name="admin_notes" class="form-control" rows="4" required
+                          placeholder="Wajib diisi! Jelaskan alasan mengapa permintaan ini ditolak atau dibatalkan..." 
+                          style="width:100%; border-radius:8px; padding:10px; border:1px solid #d1d5db; margin-top:6px; font-size:14px; resize:none;"></textarea>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeModal('rejectModalDetail')">Batal</button>
-                <button type="submit" class="btn btn-danger">Konfirmasi Tolak</button>
+            <div class="modal-footer" style="margin-top:20px; display:flex; justify-content:flex-end; gap:8px;">
+                <button type="button" class="btn btn-outline" onclick="closeModal('rejectModalDetail')" style="padding:8px 16px; border-radius:6px; border:1px solid #d1d5db; background:#fff; cursor:pointer;">Batal</button>
+                <button type="submit" class="btn btn-danger" style="padding:8px 16px; border-radius:6px; border:none; background:#dc2626; color:#fff; font-weight:600; cursor:pointer;">Konfirmasi Tolak</button>
             </div>
         </form>
     </div>

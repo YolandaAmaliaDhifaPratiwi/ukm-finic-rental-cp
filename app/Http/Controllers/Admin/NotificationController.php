@@ -116,7 +116,7 @@ class NotificationController extends Controller
                     'confirmed_at'    => $return->confirmed_at?->format('d M Y, H:i') ?? null,
                     'created_at'      => $return->created_at->format('d M Y, H:i'),
                     'photo'           => $return->photo ?? null,
-                    'link'            => route('admin.returns.show', $return->id),
+                    'link'            => route('admin.borrowing.show', $return->borrowing_id),
                 ];
             }
         }

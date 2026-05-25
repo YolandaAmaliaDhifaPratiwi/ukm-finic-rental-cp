@@ -26,12 +26,16 @@ class BorrowingRejectedNotification extends Notification
 
     public function toArray(object $notifiable): array
     {
+        $equipmentName = $this->borrowing?->equipment?->name ?? 'Alat';
+        $adminNotes    = $this->borrowing?->admin_notes ?? null;
+
         return [
-            'title'   => 'Peminjaman Ditolak',
-            'message' => $this->borrowing
-                ? "Peminjaman alat \"{$this->borrowing->equipment->name}\" ditolak oleh admin."
-                : 'Permintaan peminjaman kamu ditolak.',
-            'type'    => 'borrow_rejected',
+            'title'       => 'Peminjaman Ditolak',
+            'message'     => "Peminjaman alat \"{$equipmentName}\" ditolak oleh admin.",
+            'type'        => 'borrow_rejected',
+            // Alasan penolakan — ditampilkan di notifikasi member
+            'reason'      => $adminNotes,
+            'borrowing_id'=> $this->borrowing?->id,
         ];
     }
 }

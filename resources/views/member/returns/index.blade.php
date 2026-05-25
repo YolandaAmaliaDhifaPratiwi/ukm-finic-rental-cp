@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    {{-- Alert success/error --}}
+    <!-- {{-- Alert success/error --}}
     @if(session('success'))
         <div class="alert alert-success">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -34,7 +34,7 @@
             </svg>
             {{ session('error') }}
         </div>
-    @endif
+    @endif -->
 
     {{-- ======= SECTION 1: Alat Aktif yang Bisa Dikembalikan ======= --}}
     <div class="section-card">

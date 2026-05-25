@@ -39,40 +39,29 @@ class BorrowingController extends Controller
 
     /**
      * Detail peminjaman.
-     * - AJAX (X-Requested-With: XMLHttpRequest) → return JSON untuk notif modal
-     * - Normal request → return Blade view
+     * - AJAX → return JSON untuk notif modal
+     * - Normal → return Blade view
      */
     public function show(Borrowing $borrowing)
     {
-        $borrowing->load(['user', 'equipment', 'approver', 'returnData']);
+        $borrowing->load(['user', 'equipment', 'approver', 'returnData.user']);
 
-        // ✅ Jika request dari AJAX (notifikasi modal), return JSON
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json([
                 'id'               => $borrowing->id,
                 'transaction_code' => $borrowing->transaction_code,
                 'status'           => $borrowing->status,
-
-                // Member
                 'user_name'        => $borrowing->user->name,
                 'user_email'       => $borrowing->user->email,
                 'user_student_id'  => $borrowing->user->student_id ?? '-',
-
-                // Alat
                 'equipment_name'     => $borrowing->equipment->name,
                 'equipment_category' => ucfirst($borrowing->equipment->category ?? ''),
                 'equipment_condition'=> ucfirst($borrowing->equipment->condition ?? '-'),
-
-                // Tanggal
-                'borrow_date'      => $borrowing->borrow_date?->format('d M Y') ?? '-',
-                'return_date'      => $borrowing->return_date?->format('d M Y') ?? '-',
+                'borrow_date'      => $borrowing->borrow_date instanceof \Carbon\Carbon ? $borrowing->borrow_date->format('d M Y') : '-',
+                'return_date'      => $borrowing->return_date instanceof \Carbon\Carbon ? $borrowing->return_date->format('d M Y') : '-',
                 'duration_days'    => $borrowing->duration_days ?? '-',
                 'created_at'       => $borrowing->created_at->format('d M Y, H:i'),
-
-                // Tujuan
                 'purpose'          => $borrowing->purpose ?? 'Tidak ada keterangan.',
-
-                // Catatan admin
                 'admin_notes'      => $borrowing->admin_notes ?? null,
             ]);
         }
@@ -82,7 +71,10 @@ class BorrowingController extends Controller
 
     public function approve(Borrowing $borrowing)
     {
-        abort_if($borrowing->status !== 'pending', 422, 'Request already processed.');
+        // Jika sudah diproses, redirect dengan pesan info (bukan error 422)
+        if ($borrowing->status !== 'pending') {
+            return back()->with('info', "Request {$borrowing->transaction_code} sudah diproses sebelumnya (status: {$borrowing->status}).");
+        }
 
         $borrowing->update([
             'status'      => 'approved',
@@ -91,7 +83,6 @@ class BorrowingController extends Controller
 
         $borrowing->equipment->update(['status' => 'borrowed']);
 
-        // Kirim notif ke member
         $borrowing->load('equipment');
         $borrowing->user->notify(new BorrowingApprovedNotification($borrowing));
 
@@ -100,7 +91,10 @@ class BorrowingController extends Controller
 
     public function reject(Request $request, Borrowing $borrowing)
     {
-        abort_if($borrowing->status !== 'pending', 422, 'Request already processed.');
+        // Jika sudah diproses, redirect dengan pesan info (bukan error 422)
+        if ($borrowing->status !== 'pending') {
+            return back()->with('info', "Request {$borrowing->transaction_code} sudah diproses sebelumnya (status: {$borrowing->status}).");
+        }
 
         $request->validate(['admin_notes' => 'nullable|string|max:500']);
 
@@ -110,14 +104,54 @@ class BorrowingController extends Controller
             'approved_by' => Auth::id(),
         ]);
 
-        // Kirim notif ke member
         $borrowing->load('equipment');
         $borrowing->user->notify(new BorrowingRejectedNotification($borrowing));
 
         return back()->with('success', "Request {$borrowing->transaction_code} rejected.");
     }
 
-    public function markReturned(Request $request, Borrowing $borrowing)
+    public function rejectReturn(Request $request, Borrowing $borrowing)
+    {
+        $request->validate([
+            'admin_notes' => 'required|string|max:500',
+        ], [
+            'admin_notes.required' => 'Alasan penolakan wajib diisi.',
+        ]);
+
+        $return = $borrowing->returnData()->where('status', 'pending')->firstOrFail();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($return, $borrowing, $request) {
+            $return->update([
+                'status'      => 'rejected',
+                'admin_notes' => $request->admin_notes,
+            ]);
+
+            $borrowing->update(['return_status' => 'rejected']);
+
+            \Illuminate\Support\Facades\DB::table('notifications')->insert([
+                'id'              => \Illuminate\Support\Str::uuid(),
+                'type'            => 'App\\Notifications\\ReturnRejected',
+                'notifiable_type' => 'App\\Models\\User',
+                'notifiable_id'   => $return->user_id,
+                'data'            => json_encode([
+                    'title'        => 'Pengembalian Ditolak',
+                    'message'      => "Pengembalian \"{$borrowing->equipment->name}\" ditolak. Alasan: {$request->admin_notes}",
+                    'return_id'    => $return->id,
+                    'borrowing_id' => $borrowing->id,
+                    'type'         => 'return_rejected',
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        return back()->with('success', "Pengembalian ditolak dan notifikasi telah dikirim ke member.");
+    }
+
+    /**
+     * Menandai equipment sudah dikembalikan.
+     */
+    public function returnEquipment(Request $request, Borrowing $borrowing)
     {
         $data = $request->validate([
             'final_condition'    => 'required|in:excellent,good,minor_scratches,needs_repair',

@@ -1,360 +1,486 @@
 {{-- resources/views/admin/notifications/index.blade.php --}}
 @extends('layouts.admin')
 
-@section('title', 'Notifikasi')
+@section('title', 'Pusat Notifikasi')
 
 @push('styles')
 <style>
 /* ═══════════════════════════════════════════
-   NOTIFICATION PAGE — UKM Finic Admin
+   PREMIUM NOTIFICATION SYSTEM — UKM FINIC
    ═══════════════════════════════════════════ */
 
-.notifpage-wrap {
-    max-width: 760px;
+body {
+    background-color: #f8fafc;
+}
+
+/* Container Wrapper Utama: Menghilangkan kekosongan di kanan-kiri desktop */
+.notif-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 0 48px;
+    padding: 0 20px 40px;
+    box-sizing: border-box;
 }
 
-/* ── Header ── */
-.notifpage-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-    gap: 12px;
+.notif-main-panel {
+    min-width: 0;
 }
-.notifpage-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.notifpage-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(34,197,94,0.3);
-}
-.notifpage-title {
-    font-size: 1.5rem;
+
+/* ── Top Header Title ── */
+.notif-page-title {
+    font-size: 1.6rem;
     font-weight: 800;
-    color: #111827;
-    letter-spacing: -0.3px;
-}
-.notifpage-subtitle {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-top: 2px;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin: 0 0 4px 0;
 }
 
-/* Header Actions */
-.notifpage-actions {
+.notif-page-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* ── Filter Tab Navigation (Premium Capsule Design) ── */
+.notif-filter-bar {
     display: flex;
     gap: 8px;
-    align-items: center;
-}
-.np-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.78rem; font-weight: 600;
-    padding: 8px 14px; border-radius: 10px;
-    border: none; cursor: pointer;
-    transition: all 0.15s;
-    text-decoration: none;
-}
-.np-btn-green {
-    background: #f0fdf4; color: #16a34a;
-    border: 1px solid #bbf7d0;
-}
-.np-btn-green:hover { background: #dcfce7; }
-.np-btn-red {
-    background: #fef2f2; color: #dc2626;
-    border: 1px solid #fecaca;
-}
-.np-btn-red:hover { background: #fee2e2; }
-
-/* ── Filter Tabs ── */
-.notifpage-tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 20px;
-    background: #f9fafb;
-    padding: 5px;
+    margin: 24px 0 16px 0;
+    background: #f1f5f9;
+    padding: 6px;
     border-radius: 14px;
-    border: 1px solid #f0f0f0;
-}
-.np-tab {
-    flex: 1; text-align: center;
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 0.8rem; font-weight: 600;
-    color: #94a3b8;
-    background: transparent;
-    border: none; cursor: pointer;
-    transition: all 0.18s;
-}
-.np-tab.active {
-    background: #fff;
-    color: #16a34a;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
 }
 
-/* ── List ── */
-.notifpage-list {
+.notif-tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.notif-tab-btn:hover {
+    color: #0f172a;
+}
+
+.notif-tab-btn.active {
+    background: #ffffff;
+    color: #10b981;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* ── Notification Feed List ── */
+.notif-feed-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
-.np-item {
+/* Main Notification Item Card */
+.notif-item-card {
     display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    background: #fff;
-    border: 1px solid #f0f0f0;
+    align-items: start;
+    gap: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 16px 18px;
+    padding: 18px 24px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     text-align: left;
     width: 100%;
     box-sizing: border-box;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
-.np-item:hover {
-    border-color: #bbf7d0;
-    box-shadow: 0 4px 20px rgba(34,197,94,0.08);
-    transform: translateY(-1px);
+
+.notif-item-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.03);
 }
-.np-item.unread {
+
+/* Indikator Unread Bulat Hijau Sisi Kiri */
+.notif-item-card.unread {
     background: #f0fdf4;
-    border-color: #d1fae5;
+    border-color: #bbf7d0;
 }
-.np-item.unread::before {
+
+.notif-item-card.unread::before {
     content: '';
     position: absolute;
-    left: 0; top: 50%;
-    transform: translateY(-50%);
-    width: 4px; height: 60%;
-    background: #22c55e;
-    border-radius: 0 4px 4px 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4.5px;
+    background: #10b981;
+    border-radius: 16px 0 0 16px;
 }
 
-/* Icon */
-.np-item-icon {
-    width: 42px; height: 42px;
+/* ── Professional Vector-Style Icon Wrapper ── */
+.notif-vector-icon-box {
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-.np-icon-borrow_request   { background: #dbeafe; }
-.np-icon-return_submitted { background: #fef3c7; }
-.np-icon-borrow_approved  { background: #d1fae5; }
-.np-icon-borrow_rejected  { background: #fee2e2; }
-.np-icon-return_confirmed { background: #d1fae5; }
-.np-icon-return_rejected  { background: #fee2e2; }
-.np-icon-info             { background: #f3f4f6; }
-
-/* Content */
-.np-item-body { flex: 1; min-width: 0; }
-.np-item-title {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 3px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.np-item-msg {
-    font-size: 0.82rem;
-    color: #4b5563;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.np-item-time {
-    font-size: 0.74rem;
-    color: #9ca3af;
-    margin-top: 5px;
     display: flex;
     align-items: center;
-    gap: 4px;
-}
-.np-unread-dot {
-    width: 6px; height: 6px;
-    background: #22c55e;
-    border-radius: 50%;
+    justify-content: center;
     flex-shrink: 0;
+    border: 1px solid transparent;
 }
 
-/* Delete btn */
-.np-item-del {
-    width: 30px; height: 30px;
-    border-radius: 8px;
-    border: none; background: transparent;
-    color: #d1d5db;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    transition: all 0.15s;
-    align-self: center;
-}
-.np-item-del:hover { background: #fee2e2; color: #dc2626; }
+/* Skema Warna Status Premium Pastel */
+.icon-box-borrow_request   { background: #eff6ff; color: #2563eb; border-color: #dbeafe; }
+.icon-box-return_submitted { background: #fffbeb; color: #d97706; border-color: #fef3c7; }
+.icon-box-borrow_approved  { background: #ecfdf5; color: #059669; border-color: #d1fae5; }
+.icon-box-borrow_rejected  { background: #fdf2f2; color: #dc2626; border-color: #fee2e2; }
+.icon-box-return_confirmed { background: #ecfdf5; color: #059669; border-color: #d1fae5; }
+.icon-box-return_rejected  { background: #fdf2f2; color: #dc2626; border-color: #fee2e2; }
+.icon-box-default          { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
 
-/* ── Empty ── */
-.np-empty {
-    text-align: center;
-    padding: 64px 24px;
-    color: #9ca3af;
+/* Typography inside card */
+.notif-card-body {
+    flex: 1;
+    min-width: 0;
 }
-.np-empty-icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
-    opacity: 0.5;
-}
-.np-empty-text {
+
+.notif-card-title {
     font-size: 0.95rem;
-    font-weight: 600;
-    color: #6b7280;
+    font-weight: 700;
+    color: #0f172a;
     margin-bottom: 4px;
 }
-.np-empty-sub { font-size: 0.82rem; }
 
-/* ── Detail Modal ── */
+.notif-card-msg {
+    font-size: 0.875rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.notif-card-meta {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.notif-green-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* ── Right Column Side Control Panel (Ramping & Pas Konten) ── */
+.notif-sidebar-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 16px 20px; /* Padding vertikal dipendekkan agar pas */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 24px;
+    align-self: start; /* Mencegah card memanjang ke bawah secara otomatis */
+}
+
+.sidebar-panel-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.sidebar-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.sidebar-stat-row:last-of-type {
+    border-bottom: none;
+    margin-bottom: 14px;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Control Panel Buttons (Tema Hijau Premium) */
+.sidebar-action-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.btn-sidebar-success {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+}
+
+.btn-sidebar-success:hover {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+}
+
+/* ── Empty State Design ── */
+.notif-empty-state {
+    text-align: center;
+    padding: 64px 32px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    color: #64748b;
+}
+
+.notif-empty-icon-wrap {
+    width: 56px;
+    height: 56px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #94a3b8;
+}
+
+.notif-empty-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+}
+
+/* ── Professional Modal Overlays ── */
 .nd-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(4px);
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(6px);
     z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.22s;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
 }
+
 .nd-overlay.open {
-    opacity: 1; pointer-events: auto;
+    opacity: 1;
+    pointer-events: auto;
 }
+
 .nd-modal {
-    background: #fff;
-    border-radius: 22px;
-    width: 100%; max-width: 560px;
+    background: #ffffff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 560px;
     max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
-    transform: scale(0.94) translateY(16px);
-    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    transform: scale(0.95) translateY(12px);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 .nd-overlay.open .nd-modal {
     transform: scale(1) translateY(0);
 }
 
-/* Modal Header */
 .nd-modal-header {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 24px 24px 18px;
-    border-bottom: 1px solid #f0f0f0;
-    position: sticky; top: 0;
-    background: #fff; z-index: 1;
-    border-radius: 22px 22px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 10;
 }
-.nd-modal-icon {
-    width: 46px; height: 46px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem;
+
+.nd-modal-icon-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
 }
-.nd-modal-title-wrap { flex: 1; }
+
 .nd-modal-title {
-    font-size: 1rem; font-weight: 800; color: #111827;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
     line-height: 1.3;
 }
-.nd-modal-time {
-    font-size: 0.76rem; color: #9ca3af; margin-top: 3px;
-}
-.nd-close {
-    width: 32px; height: 32px;
-    border-radius: 8px; border: none;
-    background: #f3f4f6; color: #6b7280;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    transition: all 0.15s;
-}
-.nd-close:hover { background: #fee2e2; color: #dc2626; }
 
-/* Modal Body */
-.nd-modal-body { padding: 20px 24px 24px; }
+.nd-modal-time {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.nd-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: #f1f5f9;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    margin-left: auto;
+}
+
+.nd-close:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+/* Modal Body Inner Styling */
+.nd-modal-body {
+    padding: 24px;
+}
 
 .nd-message-box {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-left: 4px solid #22c55e;
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 0.88rem; line-height: 1.7;
-    color: #374151;
-    margin-bottom: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #10b981;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #334155;
+    margin-bottom: 24px;
 }
 
 .nd-section-label {
-    font-size: 0.72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.6px;
-    color: #9ca3af; margin-bottom: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin-bottom: 12px;
 }
 
 .nd-info-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
 }
+
 .nd-info-card {
-    background: #f9fafb;
-    border: 1px solid #f0f0f0;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
-    padding: 12px 14px;
+    padding: 14px;
 }
+
 .nd-info-card-label {
-    font-size: 0.72rem; color: #9ca3af;
-    font-weight: 600; margin-bottom: 4px;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
+
 .nd-info-card-value {
-    font-size: 0.86rem; font-weight: 700; color: #111827;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
 }
+
 .nd-info-card-sub {
-    font-size: 0.74rem; color: #6b7280; margin-top: 2px;
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 2px;
 }
 
 .nd-purpose-box {
     background: #f0fdf4;
     border: 1px solid #bbf7d0;
-    border-left: 4px solid #22c55e;
-    border-radius: 10px;
-    padding: 14px 16px;
-    font-size: 0.86rem; color: #1a2e1a;
-    line-height: 1.7; white-space: pre-line;
-    margin-bottom: 20px;
+    border-left: 4px solid #10b981;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 0.9rem;
+    color: #14532d;
+    line-height: 1.6;
+    white-space: pre-line;
+    margin-bottom: 24px;
 }
 
 .nd-full-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    margin-top: 4px;
-    font-size: 0.82rem; font-weight: 700;
-    color: #16a34a;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #ffffff;
     text-decoration: none;
-    padding: 10px 16px;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: 10px;
-    transition: all 0.15s;
-    width: 100%; justify-content: center;
+    padding: 12px 20px;
+    background: #10b981;
+    border-radius: 12px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
     box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
-.nd-full-link:hover { background: #dcfce7; }
 
-/* Status badges */
+.nd-full-link:hover {
+    background: #059669;
+}
+
+/* Modal Status Badges */
 .nd-badge {
-    display: inline-block; font-size: 0.75rem; font-weight: 700;
-    padding: 3px 10px; border-radius: 20px;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
 }
 .nd-badge-pending   { background: #fef3c7; color: #92400e; }
 .nd-badge-approved  { background: #d1fae5; color: #065f46; }
@@ -362,220 +488,278 @@
 .nd-badge-confirmed { background: #dbeafe; color: #1e40af; }
 .nd-badge-returned  { background: #f3e8ff; color: #6b21a8; }
 
-/* Loading */
+/* Loading Spinner Design */
 .nd-loading {
-    display: flex; align-items: center; justify-content: center;
-    gap: 10px; padding: 48px 24px;
-    color: #9ca3af; font-size: 0.86rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 56px 24px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
-.nd-spinner {
-    width: 22px; height: 22px;
-    border: 2px solid #e5e7eb;
-    border-top-color: #22c55e;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Toast */
+.nd-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2.5px solid #e2e8f0;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { 
+    to { transform: rotate(360deg); } 
+}
+
+/* Toast Notification Global style */
 #ndToast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: #111827; color: #fff;
-    padding: 12px 18px; border-radius: 12px;
-    font-size: 0.82rem; font-weight: 600;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
     z-index: 99999;
-    opacity: 0; transform: translateY(10px);
-    transition: all 0.25s;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
 }
-#ndToast.show { opacity: 1; transform: translateY(0); }
 
-/* Pagination */
+#ndToast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Pagination UI controls */
 .np-pagination {
-    margin-top: 24px;
+    margin-top: 32px;
     display: flex;
     justify-content: center;
 }
+
 .np-pagination .pagination {
-    display: flex; gap: 4px; align-items: center;
-}
-.np-pagination .page-item .page-link {
-    padding: 8px 13px; border-radius: 10px;
-    font-size: 0.8rem; font-weight: 600;
-    border: 1px solid #e5e7eb;
-    color: #374151; text-decoration: none;
-    transition: all 0.15s;
-}
-.np-pagination .page-item.active .page-link {
-    background: #16a34a; color: #fff; border-color: #16a34a;
-}
-.np-pagination .page-item .page-link:hover {
-    background: #f0fdf4; border-color: #bbf7d0; color: #16a34a;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
 
-@media (max-width: 600px) {
-    .notifpage-header { flex-direction: column; align-items: flex-start; }
+.np-pagination .page-item .page-link {
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    text-decoration: none;
+    background-color: #ffffff;
+    transition: all 0.15s ease;
+}
+
+.np-pagination .page-item.active .page-link {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+}
+
+.np-pagination .page-item .page-link:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+@media (max-width: 992px) {
+    .notif-dashboard-grid { grid-template-columns: 1fr; }
+    .notif-sidebar-panel { position: static; margin-top: 16px; }
+}
+
+@media (max-width: 640px) {
     .nd-info-grid { grid-template-columns: 1fr; }
-    .np-tab { font-size: 0.75rem; padding: 7px 10px; }
+    .notif-tab-btn { font-size: 0.78rem; padding: 8px 10px; }
 }
 </style>
 @endpush
 
 @section('content')
-<div class="notifpage-wrap">
+<div class="notif-dashboard-grid">
 
-    {{-- Header --}}
-    <div class="notifpage-header">
-        <div class="notifpage-title-wrap">
-            <div class="notifpage-icon">
-                <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2"
-                     viewBox="0 0 24 24">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                </svg>
-            </div>
-            <div>
-                <div class="notifpage-title">Notifikasi</div>
-                <div class="notifpage-subtitle">
-                    {{ $notifications->total() }} notifikasi total
-                    @php $unread = $notifications->getCollection()->where('read_at', null)->count(); @endphp
-                    @if($notifications->currentPage() === 1 && $unread > 0)
-                        · Semua sudah ditandai dibaca
-                    @endif
-                </div>
-            </div>
+    {{-- SISI KIRI: UTAMA (HEADER, TABS, DAFTAR FEED NOTIFIKASI) --}}
+    <div class="notif-main-panel">
+        
+        {{-- Header Section --}}
+        <div>
+            <h1 class="notif-page-title">Pusat Notifikasi</h1>
+            <p class="notif-page-subtitle">
+                Total keseluruhan sistem merekam {{ $notifications->total() }} riwayat aktivitas
+            </p>
         </div>
 
-        <div class="notifpage-actions">
-            <button class="np-btn np-btn-green" onclick="clearRead()">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                     viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/>
-                    <path d="M10 11v6M14 11v6"/></svg>
-                Hapus sudah dibaca
-            </button>
+        {{-- Filter Kategori Capsule Style Nav --}}
+        <div class="notif-filter-bar">
+            <button class="notif-tab-btn active" id="tab-all" onclick="filterTab('all', this)">Semua</button>
+            <button class="notif-tab-btn" id="tab-borrow" onclick="filterTab('borrow', this)">Peminjaman</button>
+            <button class="notif-tab-btn" id="tab-return" onclick="filterTab('return', this)">Pengembalian</button>
         </div>
-    </div>
 
-    {{-- Filter Tabs --}}
-    <div class="notifpage-tabs">
-        <button class="np-tab active" id="tab-all" onclick="filterTab('all', this)">Semua</button>
-        <button class="np-tab" id="tab-borrow" onclick="filterTab('borrow', this)">Peminjaman</button>
-        <button class="np-tab" id="tab-return" onclick="filterTab('return', this)">Pengembalian</button>
-    </div>
+        {{-- Feed List Row Penampung --}}
+        <div class="notif-feed-container" id="notifList">
+            @forelse($notifications as $notif)
+                @php
+                    $data = $notif->data;
+                    $type = $data['type'] ?? 'info';
+                    $isUnread = is_null($notif->read_at);
+                    
+                    // Box Icon Class Mapping
+                    $iconBoxClass = match($type) {
+                        'borrow_request'   => 'icon-box-borrow_request',
+                        'return_submitted' => 'icon-box-return_submitted',
+                        'borrow_approved'  => 'icon-box-borrow_approved',
+                        'borrow_rejected'  => 'icon-box-borrow_rejected',
+                        'return_confirmed' => 'icon-box-return_confirmed',
+                        'return_rejected'  => 'icon-box-return_rejected',
+                        default            => 'icon-box-default',
+                    };
 
-    {{-- List --}}
-    <div class="notifpage-list" id="notifList">
-        @forelse($notifications as $notif)
-            @php
-                $data = $notif->data;
-                $type = $data['type'] ?? 'info';
-                $isUnread = is_null($notif->read_at);
-                $icons = [
-                    'borrow_request'   => '📋',
-                    'return_submitted' => '📦',
-                    'borrow_approved'  => '✅',
-                    'borrow_rejected'  => '❌',
-                    'return_confirmed' => '✅',
-                    'return_rejected'  => '❌',
-                ];
-                $icon = $icons[$type] ?? '🔔';
-            @endphp
+                    // Premium SVG Outline Vector Graphics Map (No more emojis)
+                    $svgIcon = match($type) {
+                        'borrow_request'   => '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>',
+                        'return_submitted' => '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m8 4v10M4 7v10l8 4"/></svg>',
+                        'borrow_approved', 'return_confirmed' => '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                        'borrow_rejected', 'return_rejected'  => '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                        default            => '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                    };
+                @endphp
 
-            <button
-                class="np-item {{ $isUnread ? 'unread' : '' }}"
-                id="item-{{ $notif->id }}"
-                data-id="{{ $notif->id }}"
-                data-type="{{ $type }}"
-                onclick="openDetail('{{ $notif->id }}')"
-            >
-                <div class="np-item-icon np-icon-{{ $type }}">{{ $icon }}</div>
-                <div class="np-item-body">
-                    <div class="np-item-title">{{ $data['title'] ?? 'Notifikasi' }}</div>
-                    <div class="np-item-msg">{{ $data['message'] ?? '' }}</div>
-                    <div class="np-item-time">
-                        @if($isUnread)<span class="np-unread-dot"></span>@endif
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                        {{ $notif->created_at->diffForHumans() }}
+                <button
+                    class="notif-item-card {{ $isUnread ? 'unread' : '' }}"
+                    id="item-{{ $notif->id }}"
+                    data-id="{{ $notif->id }}"
+                    data-type="{{ $type }}"
+                    onclick="openDetail('{{ $notif->id }}')"
+                >
+                    <div class="notif-vector-icon-box {{ $iconBoxClass }}">
+                        {!! $svgIcon !!}
                     </div>
-                </div>
-                <button class="np-item-del" onclick="event.stopPropagation(); deleteNotif('{{ $notif->id }}')" title="Hapus">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                         viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/>
-                        <path d="M10 11v6M14 11v6"/></svg>
+                    
+                    <div class="notif-card-body">
+                        <div class="notif-card-title">{{ $data['title'] ?? 'Pemberitahuan Sistem' }}</div>
+                        <div class="notif-card-msg">{{ $data['message'] ?? '' }}</div>
+                        <div class="notif-card-meta">
+                            @if($isUnread)<span class="notif-green-dot" title="Belum dibaca"></span>@endif
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                            {{ $notif->created_at->diffForHumans() }}
+                        </div>
+                    </div>
                 </button>
-            </button>
-        @empty
-            <div class="np-empty">
-                <div class="np-empty-icon">🔔</div>
-                <div class="np-empty-text">Belum ada notifikasi</div>
-                <div class="np-empty-sub">Aktivitas terbaru akan muncul di sini</div>
+            @empty
+                <div class="notif-empty-state">
+                    <div class="notif-empty-icon-wrap">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                    <div class="notif-empty-title">Kotak masuk bersih</div>
+                    <p style="margin: 0; font-size: 0.875rem;">Tidak ada pemberitahuan baru yang terdaftar saat ini.</p>
+                </div>
+            @endforelse
+        </div>
+
+        {{-- Pagination Row Links Controls --}}
+        @if($notifications->hasPages())
+            <div class="np-pagination">
+                {{ $notifications->links() }}
             </div>
-        @endforelse
+        @endif
     </div>
 
-    {{-- Pagination --}}
-    @if($notifications->hasPages())
-        <div class="np-pagination">
-            {{ $notifications->links() }}
+    {{-- SISI KANAN: PANEL KONTROL RINGKASAN AKTIVITAS --}}
+    <div class="notif-sidebar-panel">
+        <div class="sidebar-panel-title">Panel Kontrol</div>
+        
+        <div class="sidebar-stat-row">
+            <span class="stat-label">Belum Dibaca</span>
+            <span class="stat-value" style="color: #10b981;">
+                {{ $notifications->getCollection()->where('read_at', null)->count() }}
+            </span>
         </div>
-    @endif
+        <div class="sidebar-stat-row">
+            <span class="stat-label">Total Halaman Ini</span>
+            <span class="stat-value">{{ $notifications->count() }}</span>
+        </div>
+        
+        <div style="margin-top: 12px;">
+            <button class="sidebar-action-btn btn-sidebar-success" onclick="clearRead()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                Bersihkan yang Dibaca
+            </button>
+        </div>
+    </div>
 
 </div>
 
-{{-- ══ DETAIL MODAL ══ --}}
+{{-- ══ MODAL BOX POP-UP DETAIL NOTIFIKASI ══ --}}
 <div class="nd-overlay" id="ndOverlay" onclick="closeModal()">
     <div class="nd-modal" onclick="event.stopPropagation()">
 
+        {{-- Modal Header Row --}}
         <div class="nd-modal-header">
-            <div class="nd-modal-icon" id="ndIcon">🔔</div>
-            <div class="nd-modal-title-wrap">
+            <div class="nd-modal-icon-container" id="ndIcon" style="background:#f1f5f9;">
+                {{-- Diisi secara dinamis melalui JavaScript --}}
+            </div>
+            <div style="flex: 1; min-width: 0;">
                 <div class="nd-modal-title" id="ndTitle">Detail Notifikasi</div>
                 <div class="nd-modal-time" id="ndTime"></div>
             </div>
-            <button class="nd-close" onclick="closeModal()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
-                     viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <button class="nd-close" onclick="closeModal()" title="Tutup">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
 
+        {{-- Loading Skeleton Loader Element --}}
         <div id="ndLoading" class="nd-loading">
             <div class="nd-spinner"></div>
-            <span>Memuat detail…</span>
+            <span>Mengambil data dari server…</span>
         </div>
 
+        {{-- Main Container Content Modal --}}
         <div id="ndContent" class="nd-modal-body" style="display:none;">
             <div class="nd-message-box" id="ndMessage"></div>
 
+            {{-- Grid Section Data Transaksi --}}
             <div id="ndInfoWrap" style="display:none;">
-                <div class="nd-section-label" id="ndInfoLabel">Informasi</div>
+                <div class="nd-section-label" id="ndInfoLabel">Informasi Lengkap</div>
                 <div class="nd-info-grid" id="ndInfoGrid"></div>
             </div>
 
+            {{-- Text Area Section Tujuan Peminjaman --}}
             <div id="ndPurposeWrap" style="display:none;">
-                <div class="nd-section-label">Tujuan Peminjaman</div>
+                <div class="nd-section-label">Tujuan Keperluan</div>
                 <div class="nd-purpose-box" id="ndPurpose"></div>
             </div>
 
+            {{-- Text Area Section Catatan Penolakan/Admin --}}
             <div id="ndAdminNoteWrap" style="display:none;">
-                <div class="nd-section-label">Catatan Admin</div>
-                <div class="nd-purpose-box" style="border-color:#fecaca;border-left-color:#ef4444;background:#fef2f2;"
-                     id="ndAdminNote"></div>
+                <div class="nd-section-label">Catatan Tambahan Admin</div>
+                <div class="nd-purpose-box" style="border-color:#fecaca; border-left-color:#ef4444; background:#fef2f2; color:#991b1b;" id="ndAdminNote"></div>
             </div>
 
+            {{-- Action Link URL Go to Detail Page Trx --}}
             <a id="ndFullLink" href="#" class="nd-full-link" style="display:none;">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                     viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
-                    <polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                Lihat halaman detail lengkap
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Buka Halaman Formulir Detail
             </a>
         </div>
 
     </div>
 </div>
 
+{{-- Global System Toast Box Element --}}
 <div id="ndToast"></div>
 @endsection
 
@@ -584,31 +768,40 @@
 (function () {
     const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-    /* ── Icon map ── */
-    const ICONS = {
-        borrow_request   : '📋',
-        return_submitted : '📦',
-        borrow_approved  : '✅',
-        borrow_rejected  : '❌',
-        return_confirmed : '✅',
-        return_rejected  : '❌',
+    // Modern Vector Icons mapping inside popups
+    const SVG_ICONS = {
+        borrow_request   : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>',
+        return_submitted : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-14L4 7m8 4v10M4 7v10l8 4"/></svg>',
+        borrow_approved  : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        return_confirmed : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        borrow_rejected  : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+        return_rejected  : '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
     };
 
-    const ICON_BG = {
-        borrow_request   : '#dbeafe',
-        return_submitted : '#fef3c7',
-        borrow_approved  : '#d1fae5',
-        borrow_rejected  : '#fee2e2',
-        return_confirmed : '#d1fae5',
-        return_rejected  : '#fee2e2',
+    const ICON_BG_COLOR = {
+        borrow_request   : '#eff6ff',
+        return_submitted : '#fffbeb',
+        borrow_approved  : '#ecfdf5',
+        borrow_rejected  : '#fdf2f2',
+        return_confirmed : '#ecfdf5',
+        return_rejected  : '#fdf2f2',
     };
 
-    /* ── Filter Tabs ── */
+    const ICON_TEXT_COLOR = {
+        borrow_request   : '#2563eb',
+        return_submitted : '#d97706',
+        borrow_approved  : '#059669',
+        borrow_rejected  : '#dc2626',
+        return_confirmed : '#059669',
+        return_rejected  : '#dc2626',
+    };
+
+    /* ── Filter Tabs Kategori Realtime ── */
     window.filterTab = function (filter, btn) {
-        document.querySelectorAll('.np-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.notif-tab-btn').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
 
-        document.querySelectorAll('.np-item').forEach(item => {
+        document.querySelectorAll('.notif-item-card').forEach(item => {
             const type = item.dataset.type || '';
             let show = true;
             if (filter === 'borrow')  show = type.startsWith('borrow');
@@ -616,15 +809,18 @@
             item.style.display = show ? '' : 'none';
         });
 
-        // Tampilkan empty state jika semua hidden
         const list = document.getElementById('notifList');
-        const visible = [...list.querySelectorAll('.np-item')].filter(el => el.style.display !== 'none');
-        let emptyEl = list.querySelector('.np-empty-dynamic');
+        const visible = [...list.querySelectorAll('.notif-item-card')].filter(el => el.style.display !== 'none');
+        let emptyEl = list.querySelector('.notif-empty-dynamic');
+        
         if (visible.length === 0) {
             if (!emptyEl) {
                 emptyEl = document.createElement('div');
-                emptyEl.className = 'np-empty np-empty-dynamic';
-                emptyEl.innerHTML = '<div class="np-empty-icon">🔍</div><div class="np-empty-text">Tidak ada notifikasi di kategori ini</div>';
+                emptyEl.className = 'notif-empty-state notif-empty-dynamic';
+                emptyEl.innerHTML = `
+                    <div class="notif-empty-icon-wrap"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
+                    <div class="notif-empty-title">Tidak ditemukan</div>
+                    <p style="margin:0;font-size:0.85rem;">Tidak ada riwayat untuk filter kategori saat ini.</p>`;
                 list.appendChild(emptyEl);
             }
         } else {
@@ -632,7 +828,7 @@
         }
     };
 
-    /* ── Open Detail Modal ── */
+    /* ── Action: Buka Box Modal Detail Notifikasi ── */
     window.openDetail = function (id) {
         const overlay = document.getElementById('ndOverlay');
         document.getElementById('ndLoading').style.display = 'flex';
@@ -642,11 +838,10 @@
         overlay.classList.add('open');
         document.body.style.overflow = 'hidden';
 
-        // Tandai item sebagai sudah dibaca di UI
         const item = document.getElementById('item-' + id);
         if (item) {
             item.classList.remove('unread');
-            item.querySelector('.np-unread-dot')?.remove();
+            item.querySelector('.notif-green-dot')?.remove();
         }
 
         fetch(`/admin/notifications/${id}`, {
@@ -661,23 +856,23 @@
         })
         .then(d => renderDetail(d))
         .catch(() => {
-            // Fallback: tampilkan pesan dari DOM
-            const msgEl = item?.querySelector('.np-item-msg');
-            const titleEl = item?.querySelector('.np-item-title');
+            const msgEl = item?.querySelector('.notif-card-msg');
+            const titleEl = item?.querySelector('.notif-card-title');
             renderFallback(titleEl?.textContent || 'Notifikasi', msgEl?.textContent || '');
         });
     };
 
     function renderDetail(d) {
-        // Header
         const type = d.type || 'info';
-        const icon = document.getElementById('ndIcon');
-        icon.textContent = ICONS[type] || '🔔';
-        icon.style.background = ICON_BG[type] || '#f3f4f6';
+        const iconContainer = document.getElementById('ndIcon');
+        
+        // Render Vector Graphic dynamically into the modal box header
+        iconContainer.innerHTML = SVG_ICONS[type] || '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        iconContainer.style.background = ICON_BG_COLOR[type] || '#f1f5f9';
+        iconContainer.style.color = ICON_TEXT_COLOR[type] || '#64748b';
+        
         document.getElementById('ndTitle').textContent = d.title || 'Notifikasi';
         document.getElementById('ndTime').textContent = d.created_at || '';
-
-        // Message
         document.getElementById('ndMessage').textContent = d.message || '';
 
         const infoWrap = document.getElementById('ndInfoWrap');
@@ -686,49 +881,47 @@
         const adminNoteWrap = document.getElementById('ndAdminNoteWrap');
         const fullLink = document.getElementById('ndFullLink');
 
-        // Reset semua section
         infoWrap.style.display = 'none';
         purposeWrap.style.display = 'none';
         adminNoteWrap.style.display = 'none';
         fullLink.style.display = 'none';
-        // Reset label purpose ke default
-        const purposeLabel = purposeWrap.querySelector('.nd-section-label');
-        if (purposeLabel) purposeLabel.textContent = 'Tujuan Peminjaman';
 
-        // Borrowing detail
+        const purposeLabel = purposeWrap.querySelector('.nd-section-label');
+        if (purposeLabel) purposeLabel.textContent = 'Tujuan Keperluan';
+
+        // Tipe Alur Data Transaksi Peminjaman Alat UKM
         if (d.borrowing) {
             const b = d.borrowing;
-            document.getElementById('ndInfoLabel').textContent = 'Informasi Peminjaman';
+            document.getElementById('ndInfoLabel').textContent = 'Informasi Transaksi Peminjaman';
             infoGrid.innerHTML = `
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">👤 Member</div>
+                    <div class="nd-info-card-label">👤 Peminjam (Member)</div>
                     <div class="nd-info-card-value">${esc(b.user_name)}</div>
                     <div class="nd-info-card-sub">${esc(b.user_email || '')}${b.user_student_id && b.user_student_id !== '-' ? ' · ' + esc(b.user_student_id) : ''}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📋 Status</div>
+                    <div class="nd-info-card-label">📑 Status Validasi</div>
                     <div class="nd-info-card-value">${statusBadge(b.status)}</div>
                     <div class="nd-info-card-sub">${esc(b.transaction_code || '')}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📷 Alat</div>
+                    <div class="nd-info-card-label">📷 Inventaris Alat</div>
                     <div class="nd-info-card-value">${esc(b.equipment_name)}</div>
                     <div class="nd-info-card-sub">${esc(b.equipment_category || '')}${b.equipment_condition ? ' · ' + esc(b.equipment_condition) : ''}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">⏱ Durasi</div>
-                    <div class="nd-info-card-value">${b.duration_days || '-'} Hari</div>
-                    <div class="nd-info-card-sub">Diajukan ${esc(b.created_at || '')}</div>
+                    <div class="nd-info-card-label">⏱ Batas Waktu</div>
+                    <div class="nd-info-card-value">${b.duration_days || '-'} Hari Peminjaman</div>
+                    <div class="nd-info-card-sub">Masuk sistem ${esc(b.created_at || '')}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📅 Tgl Pinjam</div>
+                    <div class="nd-info-card-label">📅 Tanggal Pengambilan</div>
                     <div class="nd-info-card-value">${b.borrow_date || '-'}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📅 Rencana Kembali</div>
+                    <div class="nd-info-card-label">📅 Batas Target Kembali</div>
                     <div class="nd-info-card-value">${b.return_date || '-'}</div>
-                </div>
-            `;
+                </div>`;
             infoWrap.style.display = 'block';
 
             if (b.purpose) {
@@ -745,39 +938,36 @@
             }
         }
 
-        // Return detail
+        // Tipe Alur Data Transaksi Pengembalian Alat Finic
         if (d.return) {
             const r = d.return;
-            document.getElementById('ndInfoLabel').textContent = 'Informasi Pengembalian';
+            document.getElementById('ndInfoLabel').textContent = 'Informasi Transaksi Pengembalian';
             infoGrid.innerHTML = `
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">👤 Member</div>
+                    <div class="nd-info-card-label">👤 Pengembali (Member)</div>
                     <div class="nd-info-card-value">${esc(r.user_name)}</div>
                     <div class="nd-info-card-sub">${esc(r.user_email || '')}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📋 Status</div>
+                    <div class="nd-info-card-label">📑 Status Penyerahan</div>
                     <div class="nd-info-card-value">${statusBadge(r.status)}</div>
                     <div class="nd-info-card-sub">${esc(r.transaction_code || '')}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📷 Alat</div>
+                    <div class="nd-info-card-label">📷 Inventaris Alat</div>
                     <div class="nd-info-card-value">${esc(r.equipment_name)}</div>
                     <div class="nd-info-card-sub">${esc(r.equipment_category || '')}</div>
                 </div>
                 <div class="nd-info-card">
-                    <div class="nd-info-card-label">📅 Dikembalikan</div>
+                    <div class="nd-info-card-label">📅 Waktu Penyerahan Fisik</div>
                     <div class="nd-info-card-value">${esc(r.returned_at || '-')}</div>
-                    ${r.confirmed_at ? `<div class="nd-info-card-sub">Dikonfirmasi: ${esc(r.confirmed_at)}</div>` : ''}
-                </div>
-            `;
+                    ${r.confirmed_at ? `<div class="nd-info-card-sub">Verif Admin: ${esc(r.confirmed_at)}</div>` : ''}
+                </div>`;
             infoWrap.style.display = 'block';
 
-            // Kondisi alat saat dikembalikan
             if (r.condition_notes) {
                 document.getElementById('ndPurpose').textContent = r.condition_notes;
-                const purposeLabel = purposeWrap.querySelector('.nd-section-label');
-                if (purposeLabel) purposeLabel.textContent = 'Catatan Kondisi Alat';
+                if (purposeLabel) purposeLabel.textContent = 'Catatan Kondisi Fisik Alat';
                 purposeWrap.style.display = 'block';
             }
             if (r.admin_notes) {
@@ -797,6 +987,9 @@
     function renderFallback(title, message) {
         document.getElementById('ndTitle').textContent = title;
         document.getElementById('ndMessage').textContent = message;
+        document.getElementById('ndIcon').innerHTML = '<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        document.getElementById('ndIcon').style.background = '#f1f5f9';
+        document.getElementById('ndIcon').style.color = '#64748b';
         document.getElementById('ndInfoWrap').style.display = 'none';
         document.getElementById('ndPurposeWrap').style.display = 'none';
         document.getElementById('ndAdminNoteWrap').style.display = 'none';
@@ -810,33 +1003,9 @@
         document.body.style.overflow = '';
     };
 
-    /* ── Delete ── */
-    window.deleteNotif = function (id) {
-        if (!confirm('Hapus notifikasi ini?')) return;
-        fetch(`/admin/notifications/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': CSRF,
-                'X-Requested-With': 'XMLHttpRequest',
-            }
-        })
-        .then(r => r.json())
-        .then(() => {
-            const el = document.getElementById('item-' + id);
-            if (el) {
-                el.style.transition = 'opacity 0.25s, transform 0.25s';
-                el.style.opacity = '0';
-                el.style.transform = 'translateX(20px)';
-                setTimeout(() => el.remove(), 260);
-            }
-            showToast('Notifikasi dihapus');
-        })
-        .catch(() => showToast('Gagal menghapus'));
-    };
-
-    /* ── Clear Read ── */
+    /* ── Action: Bersihkan Semua Notifikasi Sudah Dibaca ── */
     window.clearRead = function () {
-        if (!confirm('Hapus semua notifikasi yang sudah dibaca?')) return;
+        if (!confirm('Hapus seluruh riwayat notifikasi yang statusnya sudah terbaca?')) return;
         fetch('/admin/notifications/clear-read', {
             method: 'DELETE',
             headers: {
@@ -846,23 +1015,23 @@
         })
         .then(r => r.json())
         .then(() => {
-            document.querySelectorAll('.np-item:not(.unread)').forEach(el => el.remove());
-            showToast('Notifikasi sudah dibaca dihapus');
+            document.querySelectorAll('.notif-item-card:not(.unread)').forEach(el => el.remove());
+            showToast('Semua riwayat lama dibersihkan');
         })
-        .catch(() => showToast('Gagal menghapus'));
+        .catch(() => showToast('Gagal memproses penghapusan'));
     };
 
-    /* ── Helpers ── */
+    /* ── Helper: Badge Style Generator di Dalam Modal ── */
     function statusBadge(status) {
         const map = {
-            pending   : ['nd-badge-pending',   '⏳ Menunggu'],
-            approved  : ['nd-badge-approved',  '✅ Disetujui'],
-            rejected  : ['nd-badge-rejected',  '❌ Ditolak'],
-            confirmed : ['nd-badge-confirmed', '📋 Dikonfirmasi'],
-            returned  : ['nd-badge-returned',  '📦 Dikembalikan'],
+            pending   : ['nd-badge-pending',   '⏳ Menunggu Verifikasi'],
+            approved  : ['nd-badge-approved',  '✅ Disetujui Admin'],
+            rejected  : ['nd-badge-rejected',  '❌ Pengajuan Ditolak'],
+            confirmed : ['nd-badge-confirmed', '📋 Selesai Dikonfirmasi'],
+            returned  : ['nd-badge-returned',  '📦 Alat Dikembalikan'],
         };
         const [cls, label] = map[status] || ['nd-badge-pending', status || '-'];
-        return `<span class="nd-badge ${cls}">${label}</span>`;
+        return `<span class=\"nd-badge ${cls}\">${label}</span>`;
     }
 
     function esc(s) {
@@ -877,7 +1046,7 @@
         setTimeout(() => t.classList.remove('show'), 2500);
     }
 
-    /* ── ESC close modal ── */
+    // Listener Keybind Escape untuk penutupan pop-up detail modal
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') closeModal();
     });
