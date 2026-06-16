@@ -1,2 +1,10 @@
 *
+!avatars/
+!avatars/**
+!equipment/
+!equipment/**
+!profile_photos/
+!profile_photos/**
+!returns/
+!returns/**
 !.gitignore

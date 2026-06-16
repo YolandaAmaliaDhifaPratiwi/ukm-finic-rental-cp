@@ -1,4 +1,12 @@
 *
 !private/
 !public/
+!public/avatars/
+!public/avatars/**
+!public/equipment/
+!public/equipment/**
+!public/profile_photos/
+!public/profile_photos/**
+!public/returns/
+!public/returns/**
 !.gitignore
